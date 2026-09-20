@@ -2149,14 +2149,16 @@ def ai_assistant_live():
 
         # Live pip install if missing module
         if missing_module:
-            target_lib_dir = os.path.join(USERS_ROOT, username, 'lib_env')
-            os.makedirs(target_lib_dir, exist_ok=True)
-            # আগের লাইনটি মুছে ফেলে এভাবে লিখুন:
-install_msg = f'📦 [System] `{missing_module}` detected. Installing...\n'
-yield f"data: {json.dumps({'token': install_msg})}\n\n"
-            try:
-                process = subprocess.Popen(
-                    ["pip", "install", missing_module, "--no-cache-dir", "--target", target_lib_dir],
+    target_lib_dir = os.path.join(USERS_ROOT, username, 'lib_env')
+    os.makedirs(target_lib_dir, exist_ok=True)
+    
+    # আগের লাইনটি মুছে ফেলে এভাবে লিখুন:
+    install_msg = f'📦 [System] `{missing_module}` detected. Installing...\n'
+    yield f"data: {json.dumps({'token': install_msg})}\n\n"
+    
+    try:
+        process = subprocess.Popen(
+            ["pip", "install", missing_module, "--no-cache-dir", "--target", target_lib_dir],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
