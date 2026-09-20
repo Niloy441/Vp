@@ -2151,7 +2151,9 @@ def ai_assistant_live():
         if missing_module:
             target_lib_dir = os.path.join(USERS_ROOT, username, 'lib_env')
             os.makedirs(target_lib_dir, exist_ok=True)
-            yield f"data: {json.dumps({'token': f'📦 [System] `{missing_module}` detected. Installing...\n'})}\n\n"
+            # আগের লাইনটি মুছে ফেলে এভাবে লিখুন:
+install_msg = f'📦 [System] `{missing_module}` detected. Installing...\n'
+yield f"data: {json.dumps({'token': install_msg})}\n\n"
             try:
                 process = subprocess.Popen(
                     ["pip", "install", missing_module, "--no-cache-dir", "--target", target_lib_dir],
@@ -2273,7 +2275,7 @@ def fix_error():
     error_logs = data.get('error', '')
     
     # 1. Safely resolve the full path
-    full_path = os.path.normpath(os.path.join(CONTAINER_DIR, file_path))
+    full_path = os.path.normpath(os.path.join(USERS_ROOT, file_path))
     if not os.path.exists(full_path):
         return jsonify({"status": "error", "msg": "File path target missing!"})
         
