@@ -26,6 +26,7 @@ GITHUB_URL = f"https://api.github.com/repos/{GITHUB_REPO}/contents/users.json"
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
 AI_MODEL = "meta-llama/llama-3-8b-instruct"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
+
 # --- ডাটাবেস লজিক (Fixed) ---
 def load_users():
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
@@ -45,10 +46,6 @@ def load_users():
         with open(DB_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {} # Only returns empty if NO file exists anywhere
-
-
-# --- লগইন রুট (Fixed) ---
-
 
 
 def save_users(data):
@@ -72,7 +69,6 @@ def save_users(data):
         requests.put(url, json=put_data, headers=headers)
     except:
         pass
-
 
 
 if not os.path.exists(USERS_ROOT): os.makedirs(USERS_ROOT)
@@ -239,8 +235,6 @@ def start_file(filename):
         return jsonify({"status":"error", "msg": f"Launch Error: {str(e)}"})
 
 
-
-
 # --- গিটহাব ব্যাকআপ লজিক (এটি সবার উপরে থাকবে) ---
 def auto_github_backup(username, filename, file_path):
     GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip() # টোকেন ঠিক থাকলে কাজ করবে
@@ -378,11 +372,6 @@ def restart_file(filename):
     return start_file(filename)
 
 
-
-
-
-
-
 # গ্লোবাল ভেরিয়েবল (ফাংশনের বাইরে ফাইলের উপরে রাখুন)
 last_net_stats = {"in": 0, "out": 0, "time": time.time()}
 
@@ -494,11 +483,6 @@ def stats():
     })
 
 
-
-
-
-
-
 @app.route('/setuser')
 def set_user_url():
     # গিটহাব কনফিগারেশন
@@ -577,8 +561,6 @@ def set_user_url():
             "timezone": "Kolkata (IST)"
         }
     })
-
-
 
 
 # --- বাকি সব ফাংশন (অবিকল রাখা হয়েছে) ---
@@ -713,11 +695,6 @@ def terminal():
         return jsonify({"status":"success", "msg":"Executing Your File... 🛠️"})
 
 
-
-
-
-
-
 @app.route('/create_file', methods=['POST'])
 def create_file():
     if 'username' not in session: 
@@ -777,8 +754,6 @@ def create_file():
         return jsonify({"status": "error", "msg": str(e)})
 
 
-
-
 @app.route('/create_folder', methods=['POST'])
 def create_folder():
     data = request.json
@@ -815,7 +790,6 @@ def web_edit_file(name):
     
     with open(path, 'r', encoding='utf-8') as f: 
         return jsonify({"content": f.read()})
-
 
 
 @app.route('/delete/<path:name>')
@@ -1198,8 +1172,6 @@ def upload_file():
         return jsonify({"status": "success", "msg": f"'{file.filename}' !Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ 🚀"})
 
 
-
-
 # --- সিকিউরিটি কি সেট করুন ---
 ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY", "").strip()
 
@@ -1250,14 +1222,7 @@ def remove_all_users():
         return jsonify({"status": "error", "msg": str(e)})
 
 
-
-
-
-
-
 from flask import Flask, render_template_string, request, jsonify, session, redirect, url_for
-
-
 
 
 # 🚀 Security & Database
@@ -1674,8 +1639,6 @@ def ban_user(username):
     return jsonify({"status": "error", "msg": "User not found!"})
 
     
-
-
 @app.route('/activity.html')
 def activity_log():
     if 'username' not in session: 
@@ -1898,7 +1861,6 @@ import requests
 from flask import request, jsonify, session, Response, stream_with_context
 
 
-
 import requests
 import subprocess
 import os
@@ -1966,7 +1928,6 @@ def ai_fix_code(code: str, error_msg: str) -> str:
     except Exception as e:
         print(f"AI fixer error: {e}")
         return None
-
 
 
         
@@ -2147,20 +2108,20 @@ def ai_assistant_live():
         # Send initial mode
         yield f"data: {json.dumps({'mode': 'chat' if missing_module else intent_mode})}\n\n"
 
-# Live pip install if missing module
-if missing_module:
-    target_lib_dir = os.path.join(USERS_ROOT, username, 'lib_env')
-    os.makedirs(target_lib_dir, exist_ok=True)
-    install_msg = f"📦 [System] `{missing_module}` detected. Installing...\n"
-    yield f"data: {json.dumps({'token': install_msg})}\n\n"
-    try:
-        process = subprocess.Popen(
-            ["pip", "install", missing_module, "--no-cache-dir", "--target", target_lib_dir],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
+        # Live pip install if missing module
+        if missing_module:
+            target_lib_dir = os.path.join(USERS_ROOT, username, 'lib_env')
+            os.makedirs(target_lib_dir, exist_ok=True)
+            install_msg = f"📦 [System] `{missing_module}` detected. Installing...\n"
+            yield f"data: {json.dumps({'token': install_msg})}\n\n"
+            try:
+                process = subprocess.Popen(
+                    ["pip", "install", missing_module, "--no-cache-dir", "--target", target_lib_dir],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
                 warning_count = 0
                 for line in process.stdout:
                     line_clean = line.rstrip()
@@ -2404,12 +2365,12 @@ def restart_all_active_bots():
                 # ইনভায়রনমেন্ট সেটআপ
                 env = os.environ.copy()
                 venv_path = os.path.join(user_dir, 'lib_env')
-                # PYTHONPATH ফিক্স করা হয়েছে যাতে মডিউল ঠিকঠাক পায়
+                # PYTHONPATH ফিক্স করা হয়েছে যাতে মডিউল ঠিকঠাক পায়
                 env['PYTHONPATH'] = venv_path + os.pathsep + env.get('PYTHONPATH', '')
                 env['PYTHONUNBUFFERED'] = '1'
 
                 try:
-                    # কিল যদি আগে থেকে কিছু থাকে (Render রিস্টার্টের সময় এটি জরুরি)
+                    # কিল যদি আগে থেকে কিছু থাকে (Render রিস্টার্টের সময় এটি জরুরি)
                     if file_key in running_processes:
                         try:
                             old_pid = running_processes[file_key]
@@ -2417,7 +2378,7 @@ def restart_all_active_bots():
                         except: pass
                         running_processes.pop(file_key, None)
 
-                    # বোট রান (start_new_session=True ব্যবহার করা হয়েছে যাতে মেইন প্রসেস মরলে এগুলো না মরে)
+                    # বোট রান (start_new_session=True ব্যবহার করা হয়েছে যাতে মেইন প্রসেস মরলে এগুলো না মরে)
                     proc = subprocess.Popen(
                         ['python3', '-u', main_file], 
                         stdout=subprocess.PIPE, 
@@ -2434,14 +2395,14 @@ def restart_all_active_bots():
                     threading.Thread(target=capture, args=(file_key, "main.py", proc, log_file_path), daemon=True).start()
                     
                     print(f"✅ [RESTARTED] {username}/main.py (PID: {proc.pid})")
-                    time.sleep(0.3) # Render-এ দ্রুত রিস্টার্টের জন্য গ্যাপ কমানো হয়েছে
+                    time.sleep(0.3) # Render-এ দ্রুত রিস্টার্টের জন্য গ্যাপ কমানো হয়েছে
                 except Exception as e:
                     print(f"❌ [ERROR] {username}: {e}")
 
 # --- [FIXED] STARTUP ENGINE ---
 def run_everything():
-    """বুট হওয়ার সাথে সাথে রান হবে"""
-    # Render অনেক সময় ফাইল মাউন্ট করতে সময় নেয়, তাই ৫ সেকেন্ড ওয়েট করা সেফ
+    """বুট হওয়ার সাথে সাথে রান হবে"""
+    # Render অনেক সময় ফাইল মাউন্ট করতে সময় নেয়, তাই ৫ সেকেন্ড ওয়েট করা সেফ
     time.sleep(5) 
     print("🔄 [STARTUP] Syncing with GitHub...")
     try:
